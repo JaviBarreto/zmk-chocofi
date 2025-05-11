@@ -1,0 +1,31 @@
+
+name: Build ZMK firmware
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build ZMK
+        id: build
+        uses: zmkfirmware/zmk-docker-build@v1
+        with:
+          shield: chocofi_left chocofi_right
+          board: nice_nano_v2
+          config-path: config/chocofi
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          name: "Chocofi Firmware - ${{ github.sha }}"
+          tag_name: "chocofi-${{ github.sha }}"
+          files: |
+            .build/chocofi_left-nice_nano_v2-zmk.uf2
+            .build/chocofi_right-nice_nano_v2-zmk.uf2
