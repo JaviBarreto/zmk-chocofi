@@ -24,7 +24,7 @@ jobs:
           west init -l .
           west update
           west zephyr-export
-          pip3 install -r zmk/zephyr/scripts/requirements.txt
+          pip3 install -r zmk/scripts/requirements.txt
 
       - name: Build Left Side
         run: |
