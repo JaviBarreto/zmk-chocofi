@@ -27,11 +27,11 @@ jobs:
 
       - name: Build Left Side
         run: |
-          west build -s zmk -d build/chocofi_left -b nice_nano_v2 -- -DSHIELD=chocofi_left
+          west build -s config/zmk -d build/chocofi_left -b nice_nano_v2 -- -DSHIELD=chocofi_left
 
       - name: Build Right Side
         run: |
-          west build -s zmk -d build/chocofi_right -b nice_nano_v2 -- -DSHIELD=chocofi_right
+          west build -s config/zmk -d build/chocofi_right -b nice_nano_v2 -- -DSHIELD=chocofi_right
 
       - name: Upload release
         uses: softprops/action-gh-release@v1
