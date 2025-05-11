@@ -10,14 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout this config repo
         uses: actions/checkout@v3
 
-      - name: Build ZMK using Docker
+      - name: Install dependencies
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace             ghcr.io/zmkfirmware/zmk-dev-container:stable             /bin/bash -c "
-              cd /workspace &&               west init -l config &&               west update &&               west build -s zmk/app -d build/chocofi_left -b nice_nano_v2 -- -DSHIELD=chocofi_left &&               west build -s zmk/app -d build/chocofi_right -b nice_nano_v2 -- -DSHIELD=chocofi_right
-            "
+          sudo apt update
+          sudo apt install -y git cmake ninja-build gperf dfu-util device-tree-compiler wget               python3-pip python3-setuptools python3-wheel xz-utils file make gcc
+          pip3 install west
+
+      - name: Initialize West and ZMK
+        run: |
+          west init -l config
+          west update
+          west zephyr-export
+          pip3 install -r zmk/zephyr/scripts/requirements.txt
+
+      - name: Build Left Side
+        run: |
+          west build -s zmk/app -d build/chocofi_left -b nice_nano_v2 -- -DSHIELD=chocofi_left
+
+      - name: Build Right Side
+        run: |
+          west build -s zmk/app -d build/chocofi_right -b nice_nano_v2 -- -DSHIELD=chocofi_right
 
       - name: Upload release
         uses: softprops/action-gh-release@v1
