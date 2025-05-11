@@ -10,15 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Build ZMK
-        id: build
-        uses: zmkfirmware/zmk-docker-build@v1
-        with:
-          shield: chocofi_left chocofi_right
-          board: nice_nano_v2
-          config-path: config/chocofi
+      - name: Build ZMK using Docker
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace             ghcr.io/zmkfirmware/zmk-dev-container:stable             /bin/bash -c "
+              cd /workspace &&               west init -l config &&               west update &&               west build -s zmk/app -d build/chocofi_left -b nice_nano_v2 -- -DSHIELD=chocofi_left &&               west build -s zmk/app -d build/chocofi_right -b nice_nano_v2 -- -DSHIELD=chocofi_right
+            "
 
       - name: Upload release
         uses: softprops/action-gh-release@v1
@@ -27,5 +26,5 @@ jobs:
           name: "Chocofi Firmware - ${{ github.sha }}"
           tag_name: "chocofi-${{ github.sha }}"
           files: |
-            .build/chocofi_left-nice_nano_v2-zmk.uf2
-            .build/chocofi_right-nice_nano_v2-zmk.uf2
+            build/chocofi_left/zephyr/zmk.uf2
+            build/chocofi_right/zephyr/zmk.uf2
